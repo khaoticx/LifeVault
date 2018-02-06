@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">LifeVault</string>
+    <string name="loginIDLabel">Login ID:</string>
+    <string name="passwordLabel">Password:</string>
+    <string name="loginIDHint">login ID</string>
+    <string name="NewAccountBtn">New Account</string>
+    <string name="LoginBtn">Log In</string>
+    <string name="forgotPasswordBtn">Forgot Password</string>
+    <string name="emergencyRecoveryBtn">Emergency Recovery</string>
+    <string name="settingsLabel">Settings</string>
+    <string name="changePasswordBtn">Change Password</string>
+    <string name="setTimeoutBtn">Set Timeout</string>
+    <string name="setEmergencyRecoveryBtn">Set Emergency Recovery Button</string>
+</resources>
