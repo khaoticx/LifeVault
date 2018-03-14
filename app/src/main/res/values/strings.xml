@@ -11,4 +11,10 @@
     <string name="changePasswordBtn">Change Password</string>
     <string name="setTimeoutBtn">Set Timeout</string>
     <string name="setEmergencyRecoveryBtn">Set Emergency Recovery Button</string>
+    <string name="newAccountCreationTitle">New Account Creation</string>
+    <string name="confirmPWLabel">Confirm password:</string>
+    <string name="emailLabel">Email address:</string>
+    <string name="createAccountBtn">Create Account</string>
+    <string name="cancelBtn">Cancel</string>
+    <string name="emailHint">Email address</string>
 </resources>
