@@ -20,16 +20,16 @@
 
     <TextView
         android:id="@+id/loginIDLbl"
-        android:labelFor="@+id/nameTextField"
+        android:labelFor="@+id/loginIdField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:text="@string/loginIDLabel"
-        app:layout_constraintBottom_toBottomOf="@+id/nameTextField"
+        app:layout_constraintBottom_toBottomOf="@+id/loginIdField"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/nameTextField" />
+        app:layout_constraintTop_toTopOf="@+id/loginIdField" />
 
     <TextView
         android:id="@+id/passwordLbl"
@@ -94,7 +94,7 @@
         app:layout_constraintTop_toTopOf="@+id/createAccountBtn" />
 
     <EditText
-        android:id="@+id/nameTextField"
+        android:id="@+id/loginIdField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
@@ -137,5 +137,5 @@
         android:inputType="textEmailAddress"
         android:text="@string/emailHint"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nameTextField" />
+        app:layout_constraintTop_toBottomOf="@+id/loginIdField" />
 </android.support.constraint.ConstraintLayout>

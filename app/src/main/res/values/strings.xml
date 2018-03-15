@@ -16,5 +16,5 @@
     <string name="emailLabel">Email address:</string>
     <string name="createAccountBtn">Create Account</string>
     <string name="cancelBtn">Cancel</string>
-    <string name="emailHint">Email address</string>
+    <string name="emailHint">Email</string>
 </resources>
