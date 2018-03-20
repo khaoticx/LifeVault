@@ -37,8 +37,8 @@
         android:layout_height="43dp"
         android:layout_marginEnd="16dp"
         android:ems="10"
+        android:hint="@string/loginIDHint"
         android:inputType="text"
-        android:text="@string/loginIDHint"
         app:layout_constraintBaseline_toBaselineOf="@+id/textView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -50,9 +50,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:ems="10"
+        android:hint="@string/passwordHint"
         android:inputType="textPassword"
         app:layout_constraintStart_toStartOf="@+id/loginField"
-        app:layout_constraintTop_toBottomOf="@+id/loginField" />
+        app:layout_constraintTop_toBottomOf="@+id/loginField"
+        tools:hint="@string/passwordHint" />
 
     <Button
         android:id="@+id/newAccountBtn"

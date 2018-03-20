@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -39,24 +40,15 @@ public class MainActivity extends AppCompatActivity implements RecoveryDialog.Di
             public void onClick(View arg0) {
                 try {
                     if (verifyPassword()){
-
+                        gotoHomeActivity();
+                    }
+                    else{
+                        Toast.makeText(getApplicationContext(),
+                                "Login failed", Toast.LENGTH_LONG).show();
                     }
                 } catch (NoSuchAlgorithmException e) {
                     e.printStackTrace();
                 }
-
-
-                //This will display a toast if login is failed. Will be implemented correctly in the future
-
-
-
-                /*
-                if (!((EditText) findViewById(R.id.passwordField)).getText().toString().equals("password")) {
-                    Toast.makeText(getApplicationContext(),
-                            "Please enter \"password\" for debug login", Toast.LENGTH_LONG).show();
-                } else {
-                    gotoHomeActivity();
-                }*/
             }
         });
 
@@ -93,16 +85,15 @@ public class MainActivity extends AppCompatActivity implements RecoveryDialog.Di
     }
 
     private boolean verifyPassword() throws NoSuchAlgorithmException {
-        File file = new File(getApplicationContext().getFilesDir(),((EditText) findViewById(R.id.loginField)).getText().toString()+ ".txt");
+        final String FILE_PATH = ((EditText) findViewById(R.id.loginField)).getText().toString()+ ".txt";
+        File file = new File(getApplicationContext().getFilesDir(),FILE_PATH);
         if (file.exists()){
             byte[] oldHash = new byte[(int)file.length()];
 
             try {
-                FileInputStream inputStream = openFileInput(((EditText) findViewById(R.id.loginField)).getText().toString() + ".txt");
+                FileInputStream inputStream = openFileInput(FILE_PATH);
                 inputStream.read(oldHash);
                 inputStream.close();
-
-
             } catch (FileNotFoundException e) {
                 Log.d("VERIFY_PASSWORD", "FILE NOT FOUND");
             } catch (IOException e) {
@@ -110,13 +101,20 @@ public class MainActivity extends AppCompatActivity implements RecoveryDialog.Di
             }
 
             byte[] passwordByte = ((EditText) findViewById(R.id.passwordField)).getText().toString().getBytes();
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            MessageDigest md = MessageDigest.getInstance("SHA-512");
             md.update(passwordByte);
             byte[] newHash = md.digest();
-            Log.d("OLD_HASH", oldHash.toString());
-            Log.d("NEW_HASH", newHash.toString());
-            return true;
 
+             /*
+            Log.d("OLD_HASH", Base64.encodeToString(oldHash, DEFAULT));
+            Log.d("NEW_HASH", Base64.encodeToString(newHash, DEFAULT));
+            */
+
+            if (Base64.encodeToString(oldHash, Base64.DEFAULT).equals(Base64.encodeToString(newHash, Base64.DEFAULT))){
+                return true;
+            }
+
+            return false;
         }
         else{
             Log.d("VERIFY PASSWORD", "FILE NOT EXIST");

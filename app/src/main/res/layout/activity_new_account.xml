@@ -100,8 +100,8 @@
         android:layout_marginEnd="16dp"
         android:layout_marginTop="32dp"
         android:ems="10"
+        android:hint="@string/loginIDHint"
         android:inputType="textPersonName"
-        android:text="@string/loginIDHint"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/NewAccountLbl" />
 
@@ -112,6 +112,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
         android:ems="10"
+        android:hint="@string/passwordHint"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/emailField" />
@@ -123,6 +124,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
         android:ems="10"
+        android:hint="@string/confirmHint"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/passwordField" />
@@ -134,8 +136,8 @@
         android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
         android:ems="10"
+        android:hint="@string/emailHint"
         android:inputType="textEmailAddress"
-        android:text="@string/emailHint"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/loginIdField" />
 </android.support.constraint.ConstraintLayout>
