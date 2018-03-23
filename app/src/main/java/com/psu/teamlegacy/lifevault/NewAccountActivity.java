@@ -141,13 +141,17 @@ public class NewAccountActivity extends AppCompatActivity {
         return matcher.matches();
     }
 
+    //Query database to see if account already exists
     private boolean loginDoesNotExists() {
         String sqlStr = "SELECT id FROM user WHERE id = ?";
         Cursor c = theDB.rawQuery(sqlStr,
                 new String[] {((TextView) findViewById(R.id.loginIdField)).getText().toString()});
-        if(c != null && c.getCount() > 0)
+        if(c != null && c.getCount() > 0) {
+            c.close();
             return false;
+        }
 
+        c.close();
         return true;
 
     }
@@ -185,24 +189,6 @@ public class NewAccountActivity extends AppCompatActivity {
 
             long newRowId = theDB.insert("user", null, values);
         }
-
-        /*
-        FileOutputStream outputStream;
-        try {
-            outputStream = openFileOutput(((EditText) findViewById(R.id.loginIdField)).getText().toString() + ".txt", Context.MODE_PRIVATE);
-            outputStream.write(newHash);
-            outputStream.close();
-        } catch (Exception e) {
-            Log.e("FILE ERROR", "Error during file processing.");
-        }*/
-
-        /* //DEBUG code to see all files created for this app
-        Toast.makeText(getApplicationContext(),
-                "New account created", Toast.LENGTH_LONG).show();
-        String[] str = this.fileList();
-        for (String s: str) {
-            Log.wtf("ERRORRRRRR", s);
-        } */
     }
 
 

@@ -101,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements RecoveryDialog.Di
         Toast.makeText(this, "Not Yet Implemented", Toast.LENGTH_LONG).show();
     }
 
+    //Opens a database, gets hash and salt, then verify user input
     private boolean verifyPassword() throws NoSuchAlgorithmException {
         //Get a database query for the login
         String sqlStr = "SELECT id, salt, hash FROM user WHERE id = ?";
@@ -110,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements RecoveryDialog.Di
         if (c.moveToFirst()) {
             int salt = c.getInt(c.getColumnIndexOrThrow("salt"));
             String oldHash = c.getString(c.getColumnIndexOrThrow("hash"));
+            c.close();
 
             //Hash the user's input for password
             byte[] passwordByte = (salt + ((EditText) findViewById(R.id.passwordField)).getText().toString()).getBytes();
@@ -128,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements RecoveryDialog.Di
             return false;
 
         } else{
+            c.close();
             return false;
         }
     }
