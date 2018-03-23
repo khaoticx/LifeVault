@@ -7,6 +7,8 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
@@ -14,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -27,11 +30,14 @@ import static android.app.PendingIntent.getActivity;
 
 //This class implements the RecoverDialog.DialogListener as a callback interface
 public class MainActivity extends AppCompatActivity implements RecoveryDialog.DialogListener {
+    SQLiteDatabase theDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //LifeVaultDB db = new LifeVaultDB(this);
 
         //Attach a listener to UI Button
         Button logInButton = findViewById(R.id.LogInBtn);
@@ -72,6 +78,17 @@ public class MainActivity extends AppCompatActivity implements RecoveryDialog.Di
         });
     }
 
+    @Override
+    protected void onResume(){
+        super.onResume();
+        LifeVaultDB.getInstance(this).getWritableDatabase(new LifeVaultDB.OnDBReadyListener() {
+            @Override
+            public void onDBReady(SQLiteDatabase db) {
+                theDB = db;
+            }
+        });
+    }
+
     //This method will cause the Reecovery Dialog to display
     public void confirmRecovery() {
         RecoveryDialog dialog = new RecoveryDialog();
@@ -85,42 +102,34 @@ public class MainActivity extends AppCompatActivity implements RecoveryDialog.Di
     }
 
     private boolean verifyPassword() throws NoSuchAlgorithmException {
-        final String FILE_PATH = ((EditText) findViewById(R.id.loginField)).getText().toString()+ ".txt";
-        File file = new File(getApplicationContext().getFilesDir(),FILE_PATH);
-        if (file.exists()){
-            byte[] oldHash = new byte[(int)file.length()];
+        //Get a database query for the login
+        String sqlStr = "SELECT id, salt, hash FROM user WHERE id = ?";
+        Cursor c = theDB.rawQuery(sqlStr,
+                new String[] {((TextView) findViewById(R.id.loginField)).getText().toString()});
 
-            try {
-                FileInputStream inputStream = openFileInput(FILE_PATH);
-                inputStream.read(oldHash);
-                inputStream.close();
-            } catch (FileNotFoundException e) {
-                Log.d("VERIFY_PASSWORD", "FILE NOT FOUND");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        if (c.moveToFirst()) {
+            int salt = c.getInt(c.getColumnIndexOrThrow("salt"));
+            String oldHash = c.getString(c.getColumnIndexOrThrow("hash"));
 
-            byte[] passwordByte = ((EditText) findViewById(R.id.passwordField)).getText().toString().getBytes();
+            //Hash the user's input for password
+            byte[] passwordByte = (salt + ((EditText) findViewById(R.id.passwordField)).getText().toString()).getBytes();
             MessageDigest md = MessageDigest.getInstance("SHA-512");
             md.update(passwordByte);
             byte[] newHash = md.digest();
 
-             /*
-            Log.d("OLD_HASH", Base64.encodeToString(oldHash, DEFAULT));
-            Log.d("NEW_HASH", Base64.encodeToString(newHash, DEFAULT));
+            /* Debug message
+            Log.d("OLD_HASH", oldHash);
+            Log.d("NEW_HASH64", Base64.encodeToString(newHash, Base64.DEFAULT));
             */
 
-            if (Base64.encodeToString(oldHash, Base64.DEFAULT).equals(Base64.encodeToString(newHash, Base64.DEFAULT))){
+            if (oldHash.equals(Base64.encodeToString(newHash, Base64.DEFAULT)))
                 return true;
-            }
 
             return false;
-        }
-        else{
-            Log.d("VERIFY PASSWORD", "FILE NOT EXIST");
+
+        } else{
             return false;
         }
-
     }
 
     //Opens HomeActivity

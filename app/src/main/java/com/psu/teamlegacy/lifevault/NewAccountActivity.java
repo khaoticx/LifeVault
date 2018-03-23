@@ -1,25 +1,34 @@
 package com.psu.teamlegacy.lifevault;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static android.util.Base64.DEFAULT;
+
 public class NewAccountActivity extends AppCompatActivity {
+    SQLiteDatabase theDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +118,17 @@ public class NewAccountActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume(){
+        super.onResume();
+        LifeVaultDB.getInstance(this).getWritableDatabase(new LifeVaultDB.OnDBReadyListener() {
+            @Override
+            public void onDBReady(SQLiteDatabase db) {
+                theDB = db;
+            }
+        });
+    }
+
     private boolean validateLogin() {
         String loginID = ((EditText) findViewById(R.id.loginIdField)).getText().toString();
         Pattern pattern;
@@ -122,15 +142,14 @@ public class NewAccountActivity extends AppCompatActivity {
     }
 
     private boolean loginDoesNotExists() {
-        File file = new File(getApplicationContext().getFilesDir(), ((EditText) findViewById(R.id.loginIdField)).getText().toString() + ".txt");
-
-        if (file.exists()) {
-            Log.d("FILE_EXISTS", "login exists");
+        String sqlStr = "SELECT id FROM user WHERE id = ?";
+        Cursor c = theDB.rawQuery(sqlStr,
+                new String[] {((TextView) findViewById(R.id.loginIdField)).getText().toString()});
+        if(c != null && c.getCount() > 0)
             return false;
-        } else {
-            Log.d("FILE_EXISTS", "login does not exists");
-            return true;
-        }
+
+        return true;
+
     }
 
     private boolean validatePassword() {
@@ -146,11 +165,28 @@ public class NewAccountActivity extends AppCompatActivity {
     }
 
     private void generateNewAccount() throws NoSuchAlgorithmException {
-        byte[] passwordByte = ((EditText) findViewById(R.id.passwordField)).getText().toString().getBytes();
+        Random rand = new Random(System.currentTimeMillis());
+        int salt = rand.nextInt();
+
+        byte[] passwordByte = (salt + ((EditText) findViewById(R.id.passwordField)).getText().toString()).getBytes();
         MessageDigest md = MessageDigest.getInstance("SHA-512");
         md.update(passwordByte);
         byte[] newHash = md.digest();
 
+        if (theDB == null) {
+            Toast.makeText(this, "Try again in a few seconds.", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            ContentValues values = new ContentValues();
+            values.put("id", ((TextView) findViewById(R.id.loginIdField)).getText().toString());
+            values.put("email", ((TextView) findViewById(R.id.emailField)).getText().toString());
+            values.put("salt", salt);
+            values.put("hash", Base64.encodeToString(newHash, DEFAULT));
+
+            long newRowId = theDB.insert("user", null, values);
+        }
+
+        /*
         FileOutputStream outputStream;
         try {
             outputStream = openFileOutput(((EditText) findViewById(R.id.loginIdField)).getText().toString() + ".txt", Context.MODE_PRIVATE);
@@ -158,7 +194,7 @@ public class NewAccountActivity extends AppCompatActivity {
             outputStream.close();
         } catch (Exception e) {
             Log.e("FILE ERROR", "Error during file processing.");
-        }
+        }*/
 
         /* //DEBUG code to see all files created for this app
         Toast.makeText(getApplicationContext(),
