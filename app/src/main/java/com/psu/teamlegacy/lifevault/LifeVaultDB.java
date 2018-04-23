@@ -18,11 +18,15 @@ public class LifeVaultDB extends SQLiteOpenHelper{
 
     private static LifeVaultDB lvDB;
 
-    private static final String SQL_CREATE_ENTRIES =
+    private static final String SQL_CREATE_USER_TABLE =
             "CREATE TABLE user (id TEXT PRIMARY KEY, " +
             "email TEXT, " +
             "salt INTEGER, " +
             "hash TEXT)";
+
+    private static final String SQL_CREATE_NOTES_TABLE =
+            "CREATE TABLE notes (title TEXT PRIMARY KEY, " +
+                    "text TEXT)";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS user";
@@ -33,7 +37,8 @@ public class LifeVaultDB extends SQLiteOpenHelper{
 
     @Override
     public void onCreate(SQLiteDatabase db){
-        db.execSQL(SQL_CREATE_ENTRIES);
+        db.execSQL(SQL_CREATE_USER_TABLE);
+        db.execSQL(SQL_CREATE_NOTES_TABLE);
     }
 
     @Override
@@ -46,8 +51,6 @@ public class LifeVaultDB extends SQLiteOpenHelper{
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion){
         onUpgrade(db, oldVersion, newVersion);
     }
-
-
 
     public static synchronized LifeVaultDB getInstance(Context context){
         if (lvDB == null)

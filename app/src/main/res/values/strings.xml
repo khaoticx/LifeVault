@@ -19,4 +19,8 @@
     <string name="emailHint">email address</string>
     <string name="passwordHint">password</string>
     <string name="confirmHint">confirm password</string>
+    <string name="addNewNote">Add New Note</string>
+    <string name="logOut">Log Out</string>
+    <string name="settings">Settings</string>
+
 </resources>

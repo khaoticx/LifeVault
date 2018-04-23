@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+tools:context="edu.psu.jjb24.ab_ex.MainActivity">
+<item
+    android:id="@+id/home_add"
+    android:icon="@drawable/ic_add"
+    android:title="@string/addNewNote"
+    app:showAsAction="always" />
+<item android:id="@+id/home_logout"
+    android:icon="@drawable/ic_home"
+    android:title="@string/logOut"
+    app:showAsAction="always" />
+<item
+    android:id="@+id/home_settings"
+    android:icon="@drawable/ic_settings"
+    android:title="@string/settings"
+    app:showAsAction="always" />
+/>
+</menu>
