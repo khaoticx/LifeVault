@@ -1,7 +1,6 @@
 package com.psu.teamlegacy.lifevault;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -10,15 +9,12 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
@@ -108,7 +104,7 @@ public class NewAccountActivity extends AppCompatActivity {
         });
 
         //Attach a listener to the CreateNewAccount button
-        Button cancelButton = findViewById(R.id.cancelBtn);
+        Button cancelButton = findViewById(R.id.dialog_cancelBtn);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {

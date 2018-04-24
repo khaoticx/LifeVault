@@ -77,12 +77,12 @@
         android:layout_marginBottom="28dp"
         android:text="@string/createAccountBtn"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/cancelBtn"
+        app:layout_constraintEnd_toStartOf="@+id/dialog_cancelBtn"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/cancelBtn"
+        android:id="@+id/dialog_cancelBtn"
         style="@android:style/Widget.Button.Inset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

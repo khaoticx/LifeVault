@@ -16,11 +16,15 @@
     <string name="emailLabel">Email address:</string>
     <string name="createAccountBtn">Create Account</string>
     <string name="cancelBtn">Cancel</string>
+    <string name="addBtn">Add</string>
     <string name="emailHint">email address</string>
     <string name="passwordHint">password</string>
     <string name="confirmHint">confirm password</string>
     <string name="addNewNote">Add New Note</string>
     <string name="logOut">Log Out</string>
     <string name="settings">Settings</string>
+    <string name="newEntryNameHint">Title</string>
+    <string name="targetTextHint">text to be encrypted</string>
+    <string name="newNoteTitle">Add a new entry</string>
 
 </resources>
