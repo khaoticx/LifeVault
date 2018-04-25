@@ -18,7 +18,8 @@
         </activity>
         <activity android:name=".SettingsActivity" />
         <activity android:name=".HomeActivity" />
-        <activity android:name=".NewAccountActivity"></activity>
+        <activity android:name=".NewAccountActivity" />
+        <activity android:name=".AddActivity"></activity>
     </application>
 
 </manifest>

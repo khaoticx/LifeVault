@@ -126,8 +126,8 @@ public class MainActivity extends AppCompatActivity implements RecoveryDialog.Di
 
             if (oldHash.equals(Base64.encodeToString(newHash, Base64.DEFAULT)))
                 return true;
-
-            return false;
+            else
+                return false;
 
         } else{
             c.close();

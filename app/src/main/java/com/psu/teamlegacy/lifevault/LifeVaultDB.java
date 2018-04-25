@@ -1,18 +1,21 @@
 package com.psu.teamlegacy.lifevault;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
+import android.widget.Toast;
 
 /**
  * Created by jeh5723 on 3/22/18.
  */
 
-public class LifeVaultDB extends SQLiteOpenHelper{
+public class LifeVaultDB extends SQLiteOpenHelper {
     interface OnDBReadyListener {
         void onDBReady(SQLiteDatabase db);
     }
+
     public static final int DB_VERSION = 2;
     public static final String DB_NAME = "lifeVault.db";
 
@@ -20,45 +23,47 @@ public class LifeVaultDB extends SQLiteOpenHelper{
 
     private static final String SQL_CREATE_USER_TABLE =
             "CREATE TABLE user (id TEXT PRIMARY KEY, " +
-            "email TEXT, " +
-            "salt INTEGER, " +
-            "hash TEXT)";
+                    "email TEXT, " +
+                    "salt INTEGER, " +
+                    "hash TEXT)";
 
     private static final String SQL_CREATE_NOTES_TABLE =
-            "CREATE TABLE notes (title TEXT PRIMARY KEY, " +
-                    "text TEXT)";
+            "CREATE TABLE notes (id, " +
+                    "title TEXT, " +
+                    "text TEXT, " +
+                    "PRIMARY KEY (id, title))";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS user";
 
-    public LifeVaultDB(Context context){
-       super(context, DB_NAME, null, DB_VERSION);
+    public LifeVaultDB(Context context) {
+        super(context, DB_NAME, null, DB_VERSION);
     }
 
     @Override
-    public void onCreate(SQLiteDatabase db){
+    public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_USER_TABLE);
         db.execSQL(SQL_CREATE_NOTES_TABLE);
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(SQL_DELETE_ENTRIES);
         onCreate(db);
     }
 
     @Override
-    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion){
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-    public static synchronized LifeVaultDB getInstance(Context context){
+    public static synchronized LifeVaultDB getInstance(Context context) {
         if (lvDB == null)
             lvDB = new LifeVaultDB(context);
         return lvDB;
     }
 
-    public void getWritableDatabase(OnDBReadyListener listener){
+    public void getWritableDatabase(OnDBReadyListener listener) {
         new OpenDbAsyncTask().execute(listener);
     }
 
@@ -66,13 +71,13 @@ public class LifeVaultDB extends SQLiteOpenHelper{
         OnDBReadyListener listener;
 
         @Override
-        protected SQLiteDatabase doInBackground(OnDBReadyListener... params){
+        protected SQLiteDatabase doInBackground(OnDBReadyListener... params) {
             listener = params[0];
             return LifeVaultDB.lvDB.getWritableDatabase();
         }
 
         @Override
-        protected void onPostExecute(SQLiteDatabase db){
+        protected void onPostExecute(SQLiteDatabase db) {
             listener.onDBReady(db);
         }
     }
