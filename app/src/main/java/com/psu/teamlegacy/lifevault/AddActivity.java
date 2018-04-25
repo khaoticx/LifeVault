@@ -8,13 +8,24 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.security.MessageDigest;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
+
+import static android.util.Base64.DEFAULT;
 
 public class AddActivity extends AppCompatActivity {
     private String loginID;
@@ -67,29 +78,50 @@ public class AddActivity extends AppCompatActivity {
     }
 
     public void addNoteIntoDatabase(String loginID, String password, String title, String text){
-        if (!text.equals("")){
-            /*
+        byte[] encryptedData = null;
 
-            //ENCRYPT TEXT
+        if (!text.equals("")){
+            try {
+                byte[] key = password.getBytes("utf-8");
+                byte[] unencryptedText = text.getBytes("utf-8");
+                Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+                SecretKeySpec specKey = new SecretKeySpec(key, "AES");
+                cipher.init(Cipher.ENCRYPT_MODE, specKey);
+                encryptedData = cipher.doFinal(unencryptedText);
+
+                //Clear data
+                key = null;
+                unencryptedText = null;
+
+            } catch (UnsupportedEncodingException ex){
+                Log.e("UnsupportedEncoding", ex.toString());
+            } catch (NoSuchPaddingException ex){
+                Log.e("NoSuchPadding", ex.toString());
+            } catch (NoSuchAlgorithmException ex){
+                Log.e("NoSuchAlgorithm", ex.toString());
+            } catch (InvalidKeyException ex){
+                Log.e("InvalidKey", ex.toString());
+            } catch (IllegalBlockSizeException ex) {
+                    Log.e("IllegalBlockSize", ex.toString());
+            } catch (BadPaddingException ex) {
+                    Log.e("BadPadding", ex.toString());
+            }
+
 
             ContentValues values = new ContentValues();
             values.put("id", loginID);
             values.put("title", title);
-            values.put("text", newHash);
+            values.put("text", Base64.encodeToString(encryptedData, DEFAULT));
 
             try {
-                    db.insert("notes",null,values);
+                theDB.insert("notes",null,values);
 
-                } else {
-                    String where = "_id = " + rowid;
-                    db.update("jokes", values, where,null);
-                    setResult(RESULT_DB_CHANGED);
-                }
-
-                finish(); // Quit activity
             } catch (SQLException e) {
-                Toast.makeText(this,"Error updating database.",Toast.LENGTH_LONG).show();
-            } */
+                Toast.makeText(this,"Error, new note not add.",Toast.LENGTH_LONG).show();
+            }
+        }
+        else {
+            Toast.makeText(this, "Note is empty..", Toast.LENGTH_LONG).show();
         }
     }
 

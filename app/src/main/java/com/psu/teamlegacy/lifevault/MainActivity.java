@@ -1,32 +1,19 @@
 package com.psu.teamlegacy.lifevault;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
-import android.content.Context;
-import android.content.DialogInterface;
+
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import static android.app.PendingIntent.getActivity;
 
 //This class implements the RecoverDialog.DialogListener as a callback interface
 public class MainActivity extends AppCompatActivity implements RecoveryDialog.DialogListener {
@@ -126,13 +113,10 @@ public class MainActivity extends AppCompatActivity implements RecoveryDialog.Di
 
             if (oldHash.equals(Base64.encodeToString(newHash, Base64.DEFAULT)))
                 return true;
-            else
-                return false;
-
-        } else{
+        } else {
             c.close();
-            return false;
         }
+        return false;
     }
 
     //Opens HomeActivity
