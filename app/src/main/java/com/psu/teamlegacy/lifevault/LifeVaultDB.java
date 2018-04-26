@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
 
 /**
@@ -27,7 +28,9 @@ public class LifeVaultDB extends SQLiteOpenHelper {
             "CREATE TABLE user (id TEXT PRIMARY KEY, " +
                     "email TEXT, " +
                     "salt INTEGER, " +
-                    "hash TEXT)";
+                    "hash TEXT, " +
+                    "timeout INTEGER, " +
+                    "remail TEXT)";
 
     private static final String SQL_CREATE_NOTES_TABLE =
             "CREATE TABLE notes (id TEXT, title TEXT, data TEXT, iv TEXT, salt TEXT, PRIMARY KEY (id, title))";
@@ -42,8 +45,10 @@ public class LifeVaultDB extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        Log.e("DB onCreate()", "running");
         db.execSQL(SQL_CREATE_USER_TABLE);
         db.execSQL(SQL_CREATE_NOTES_TABLE);
+        Log.e("DB onCreate()", "done");
     }
 
     @Override
