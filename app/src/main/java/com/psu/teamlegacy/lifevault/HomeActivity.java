@@ -176,6 +176,8 @@ public class HomeActivity extends AppCompatActivity {
 
             case R.id.home_settings:
                 intent = new Intent(this, SettingsActivity.class);
+                intent.putExtra("LOGIN_ID", loginID);
+                intent.putExtra("PASSWORD", password);
                 startActivity(intent);
                 return true;
             default:
