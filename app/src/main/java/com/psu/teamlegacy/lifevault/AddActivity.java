@@ -83,8 +83,6 @@ public class AddActivity extends AppCompatActivity {
     }
 
     public void addNoteIntoDatabase(String loginID, String password, String title, String data){
-        byte[] encryptedData = null;
-
         if (!data.equals("")){
             try {
                 byte[] unencryptedText = data.getBytes("UTF-8");
@@ -100,8 +98,6 @@ public class AddActivity extends AppCompatActivity {
                 Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
                 SecretKeySpec specKey = new SecretKeySpec(key, "AES");
                 cipher.init(Cipher.ENCRYPT_MODE, specKey);
-                String encodedIV = Base64.encodeToString(cipher.getIV(), DEFAULT);
-                encryptedData = cipher.doFinal(unencryptedText);
 
                 //Remove trace of message
                 for (int i = 0; i < unencryptedText.length; i++) {
@@ -111,9 +107,9 @@ public class AddActivity extends AppCompatActivity {
                 ContentValues values = new ContentValues();
                 values.put("id", loginID);
                 values.put("title", title);
-                values.put("data", Base64.encodeToString(encryptedData, DEFAULT));
-                values.put("iv", encodedIV);
-                values.put("salt", salt);
+                values.put("data", Base64.encodeToString(cipher.doFinal(unencryptedText), Base64.DEFAULT));
+                values.put("iv", Base64.encodeToString(cipher.getIV(), Base64.DEFAULT));
+                values.put("salt", Base64.encodeToString(salt, Base64.DEFAULT));
 
                 try {
                     theDB.insert("notes",null,values);
@@ -122,7 +118,6 @@ public class AddActivity extends AppCompatActivity {
                     Log.e("SQLException", ex.toString());
                     Toast.makeText(this,"Error, new note not added.",Toast.LENGTH_LONG).show();
                 }
-
 
             } catch (UnsupportedEncodingException ex){
                 Log.e("UnsupportedEncoding", ex.toString());
