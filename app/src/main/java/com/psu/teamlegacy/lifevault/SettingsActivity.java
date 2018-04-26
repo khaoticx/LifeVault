@@ -3,10 +3,15 @@ package com.psu.teamlegacy.lifevault;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceFragment;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,6 +21,7 @@ import java.security.NoSuchAlgorithmException;
 public class SettingsActivity extends AppCompatActivity {
     private String loginID;
     private String password;
+    private SimpleCursorAdapter adapter;
     private SQLiteDatabase theDB;
 
     @Override
@@ -34,6 +40,17 @@ public class SettingsActivity extends AppCompatActivity {
             loginID = (String) savedInstanceState.getSerializable("LOGIN_ID");
             password = (String) savedInstanceState.getSerializable("PASSWORD");
         }
+    }
+
+
+
+    public Cursor getAllNotes(){
+        if (theDB == null){
+            Log.e("NULLLLLLLLL"," NULLLLLLLLLL");
+        }
+
+        return theDB.rawQuery("SELECT rowid _id,* FROM user WHERE id = ? ", new String[] {loginID});
+
     }
 
     public static class SettingsFragment extends PreferenceFragment {

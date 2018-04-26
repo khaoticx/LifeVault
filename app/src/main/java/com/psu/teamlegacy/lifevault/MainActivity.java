@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
@@ -14,6 +15,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Properties;
+
 
 //This class implements the RecoverDialog.DialogListener as a callback interface
 public class MainActivity extends AppCompatActivity implements RecoveryDialog.DialogListener {
@@ -76,16 +81,53 @@ public class MainActivity extends AppCompatActivity implements RecoveryDialog.Di
         });
     }
 
-    //This method will cause the Reecovery Dialog to display
+    //This method will cause the Recovery Dialog to display
     public void confirmRecovery() {
         RecoveryDialog dialog = new RecoveryDialog();
         dialog.show(getFragmentManager(), "RecoveryDialogFragment");
     }
 
     //Positive click listener for recovery dialog fragment
-    public void onPositiveClick() {
+    public void onPositiveClick(){//String loginID, String newTitle){
         //Temporary toast to test button.
-        Toast.makeText(this, "Not Yet Implemented", Toast.LENGTH_LONG).show();
+        Date currentTime = Calendar.getInstance().getTime();
+        long offsetMult = 1000 * 60 * 60;
+        //Toast.makeText(this, "Not Yet Implemented.", Toast.LENGTH_LONG).show();
+        // /* // not ready yet
+        if (theDB == null) {
+            Toast.makeText(this, "Try again in a few seconds.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        else {
+            Cursor cursor = theDB.rawQuery("SELECT * FROM user WHERE id = ?", new String[]{
+                    ((TextView) findViewById(R.id.loginField)).getText().toString()
+            });
+            //Cursor cursor = theDB.rawQuery("SELECT title FROM notes WHERE id=\"" + loginID + "\" AND title=\"" + newTitle + "\";", null);
+
+            if (((TextView) findViewById(R.id.loginField)).getText().toString().equals("")){
+                cursor.close();
+                return;
+            }
+
+            if (cursor.moveToFirst()) {
+                int delay = cursor.getInt(cursor.getColumnIndexOrThrow("timeout"));
+                long recoverTime = cursor.getLong(cursor.getColumnIndexOrThrow("recoverstarttime"));
+                String emailAddress = cursor.getString(cursor.getColumnIndexOrThrow("email"));
+                String recoverEmailAddress = cursor.getString(cursor.getColumnIndexOrThrow("remail"));
+                Date dbRecoverTime = new Date(recoverTime + offsetMult * delay); // assumes milliseconds
+                if (recoverTime < 0)
+                    Toast.makeText(this, "Recovery email sent to " + emailAddress, Toast.LENGTH_LONG).show();
+                else if (dbRecoverTime.compareTo(currentTime) > 0)
+                    Toast.makeText(this, "Recovery time is not yet reached.", Toast.LENGTH_LONG).show();
+                else
+                    Toast.makeText(this, "Recovery email sent to " + recoverEmailAddress, Toast.LENGTH_LONG).show();
+                cursor.close();
+                return;
+            }
+
+            cursor.close();
+            return;
+        }// */
     }
 
     //Opens a database, gets hash and salt, then verify user input
