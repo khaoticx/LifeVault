@@ -182,8 +182,8 @@ public class NewAccountActivity extends AppCompatActivity {
             values.put("email", ((TextView) findViewById(R.id.emailField)).getText().toString());
             values.put("salt", salt);
             values.put("hash", Base64.encodeToString(newHash, DEFAULT));
-            values.put("timeout", 24);
-            values.put("remail", "");
+            values.put("timeout", 24); // hours
+            values.put("remail", ((TextView) findViewById(R.id.rEmailField)).getText().toString());
             values.put("recoverstarttime", -1);
 
             long newRowId = theDB.insert("user", null, values);
