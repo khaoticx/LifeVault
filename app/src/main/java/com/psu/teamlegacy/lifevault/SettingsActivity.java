@@ -5,7 +5,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class SettingsActivity extends AppCompatActivity {
     private String loginID;
@@ -38,29 +44,5 @@ public class SettingsActivity extends AppCompatActivity {
             // Load the preferences from an XML resource
             addPreferencesFromResource(R.xml.preferences);
         }
-    }
-    public boolean checkIfNotExists(String loginID, String newTitle){
-        if (theDB == null) {
-            Toast.makeText(this, "Try again in a few seconds.", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        else {
-            Cursor cursor = theDB.rawQuery("SELECT title FROM notes WHERE id = ? AND title = ?", new String[]{loginID, newTitle});
-            //Cursor cursor = theDB.rawQuery("SELECT title FROM notes WHERE id=\"" + loginID + "\" AND title=\"" + newTitle + "\";", null);
-
-            if (newTitle.equals("")){
-                cursor.close();
-                return false;
-            }
-
-            if (cursor.moveToFirst()) {
-                cursor.close();
-                return false;
-            }
-
-            cursor.close();
-            return true;
-        }
-
     }
 }

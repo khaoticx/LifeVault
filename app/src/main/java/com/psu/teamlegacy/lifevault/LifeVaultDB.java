@@ -39,9 +39,20 @@ public class LifeVaultDB extends SQLiteOpenHelper {
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS user";
 
+    private static final String SQL_SET_PW_BEGIN =
+            "UPDATE user SET hash = ";
+    private static final String SQL_SET_PW_MIDDLE =
+            " WHERE id = ";
+
     public LifeVaultDB(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
         appContext = context.getApplicationContext();
+    }
+
+    public void updatePW(SQLiteDatabase db, String id, String value){
+        String query = SQL_SET_PW_BEGIN + id +
+                SQL_SET_PW_MIDDLE + value + ";";
+        db.execSQL(query);
     }
 
     @Override
