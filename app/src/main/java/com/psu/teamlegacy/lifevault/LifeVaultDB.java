@@ -30,7 +30,8 @@ public class LifeVaultDB extends SQLiteOpenHelper {
                     "salt INTEGER, " +
                     "hash TEXT, " +
                     "timeout INTEGER, " +
-                    "remail TEXT)";
+                    "remail TEXT, " +
+                    "recoverstarttime INTEGER)";
 
     private static final String SQL_CREATE_NOTES_TABLE =
             "CREATE TABLE notes (id TEXT, title TEXT, data TEXT, iv TEXT, salt TEXT, PRIMARY KEY (id, title))";

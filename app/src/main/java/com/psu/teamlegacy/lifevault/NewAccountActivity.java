@@ -184,6 +184,7 @@ public class NewAccountActivity extends AppCompatActivity {
             values.put("hash", Base64.encodeToString(newHash, DEFAULT));
             values.put("timeout", 24);
             values.put("remail", "");
+            values.put("recoverstarttime", -1);
 
             long newRowId = theDB.insert("user", null, values);
         }
