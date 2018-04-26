@@ -20,12 +20,12 @@
 
     <TextView
         android:id="@+id/loginIDLbl"
-        android:labelFor="@+id/loginIdField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
+        android:labelFor="@+id/loginIdField"
         android:text="@string/loginIDLabel"
         app:layout_constraintBottom_toBottomOf="@+id/loginIdField"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,12 +33,12 @@
 
     <TextView
         android:id="@+id/passwordLbl"
-        android:labelFor="@+id/passwordField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
+        android:labelFor="@+id/passwordField"
         android:text="@string/passwordLabel"
         app:layout_constraintBottom_toBottomOf="@+id/passwordField"
         app:layout_constraintStart_toStartOf="parent"
@@ -46,12 +46,12 @@
 
     <TextView
         android:id="@+id/confirmPasswordLbl"
-        android:labelFor="@+id/confirmPasswordField"
         android:layout_width="wrap_content"
         android:layout_height="34dp"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
+        android:labelFor="@+id/confirmPasswordField"
         android:text="@string/confirmPWLabel"
         app:layout_constraintBottom_toBottomOf="@+id/confirmPasswordField"
         app:layout_constraintStart_toStartOf="parent"
@@ -59,11 +59,11 @@
 
     <TextView
         android:id="@+id/emailLbl"
-        android:labelFor="@+id/emailField"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="16dp"
+        android:labelFor="@+id/emailField"
         android:text="@string/emailLabel"
         app:layout_constraintBottom_toBottomOf="@+id/emailField"
         app:layout_constraintStart_toStartOf="parent"
@@ -74,23 +74,25 @@
         style="@android:style/Widget.Button.Inset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="28dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
         android:text="@string/createAccountBtn"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/dialog_cancelBtn"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/dialog_cancelBtn" />
 
     <Button
         android:id="@+id/dialog_cancelBtn"
         style="@android:style/Widget.Button.Inset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:text="@string/cancelBtn"
         app:layout_constraintBottom_toBottomOf="@+id/createAccountBtn"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/createAccountBtn"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/createAccountBtn"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/createAccountBtn" />
 
     <EditText

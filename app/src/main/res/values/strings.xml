@@ -26,5 +26,6 @@
     <string name="newEntryNameHint">Title</string>
     <string name="targetTextHint">text to be encrypted</string>
     <string name="newNoteTitle">Add a new entry</string>
+    <string name="notesLabel">Notes:</string>
 
 </resources>

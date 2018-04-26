@@ -18,11 +18,16 @@ import android.widget.Toast;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import static android.util.Base64.DEFAULT;
@@ -30,7 +35,7 @@ import static android.util.Base64.DEFAULT;
 public class AddActivity extends AppCompatActivity {
     private String loginID;
     private String password;
-    SQLiteDatabase theDB;
+    private SQLiteDatabase theDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,21 +82,47 @@ public class AddActivity extends AppCompatActivity {
 
     }
 
-    public void addNoteIntoDatabase(String loginID, String password, String title, String text){
+    public void addNoteIntoDatabase(String loginID, String password, String title, String data){
         byte[] encryptedData = null;
 
-        if (!text.equals("")){
+        if (!data.equals("")){
             try {
-                byte[] key = password.getBytes("utf-8");
-                byte[] unencryptedText = text.getBytes("utf-8");
+                byte[] unencryptedText = data.getBytes("UTF-8");
+
+                SecureRandom random = new SecureRandom();
+                byte[] salt = new byte[16];
+                random.nextBytes(salt);
+
+                KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 256); // AES-256
+                SecretKeyFactory f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+                byte[] key = f.generateSecret(spec).getEncoded();
+
                 Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
                 SecretKeySpec specKey = new SecretKeySpec(key, "AES");
                 cipher.init(Cipher.ENCRYPT_MODE, specKey);
+                String encodedIV = Base64.encodeToString(cipher.getIV(), DEFAULT);
                 encryptedData = cipher.doFinal(unencryptedText);
 
-                //Clear data
-                key = null;
-                unencryptedText = null;
+                //Remove trace of message
+                for (int i = 0; i < unencryptedText.length; i++) {
+                    unencryptedText[i] = 0;
+                }
+
+                ContentValues values = new ContentValues();
+                values.put("id", loginID);
+                values.put("title", title);
+                values.put("data", Base64.encodeToString(encryptedData, DEFAULT));
+                values.put("iv", encodedIV);
+                values.put("salt", salt);
+
+                try {
+                    theDB.insert("notes",null,values);
+                    gotoHomeActivity();
+                } catch (SQLException ex) {
+                    Log.e("SQLException", ex.toString());
+                    Toast.makeText(this,"Error, new note not added.",Toast.LENGTH_LONG).show();
+                }
+
 
             } catch (UnsupportedEncodingException ex){
                 Log.e("UnsupportedEncoding", ex.toString());
@@ -105,19 +136,8 @@ public class AddActivity extends AppCompatActivity {
                     Log.e("IllegalBlockSize", ex.toString());
             } catch (BadPaddingException ex) {
                     Log.e("BadPadding", ex.toString());
-            }
-
-
-            ContentValues values = new ContentValues();
-            values.put("id", loginID);
-            values.put("title", title);
-            values.put("text", Base64.encodeToString(encryptedData, DEFAULT));
-
-            try {
-                theDB.insert("notes",null,values);
-
-            } catch (SQLException e) {
-                Toast.makeText(this,"Error, new note not add.",Toast.LENGTH_LONG).show();
+            } catch (InvalidKeySpecException ex) {
+                Log.e("InvalidKeySpec", ex.toString());
             }
         }
         else {
@@ -126,30 +146,37 @@ public class AddActivity extends AppCompatActivity {
     }
 
     public boolean checkIfNotExists(String loginID, String newTitle){
-
-        String where = "id = " + loginID + " AND title = " + newTitle;
-        String[] projection = {"title"};
-        Cursor cursor = theDB.query("notes", projection, where, null, null, null, null);
-        if (newTitle.equals("")){
-            cursor.close();
+        if (theDB == null) {
+            Toast.makeText(this, "Try again in a few seconds.", Toast.LENGTH_SHORT).show();
             return false;
         }
+        else {
+            Cursor cursor = theDB.rawQuery("SELECT title FROM notes WHERE id = ? AND title = ?", new String[]{loginID, newTitle});
+            //Cursor cursor = theDB.rawQuery("SELECT title FROM notes WHERE id=\"" + loginID + "\" AND title=\"" + newTitle + "\";", null);
 
-        if (cursor.moveToFirst()) {
+            if (newTitle.equals("")){
+                cursor.close();
+                return false;
+            }
+
+            if (cursor.moveToFirst()) {
+                cursor.close();
+                return false;
+            }
+
             cursor.close();
-            return false;
+            return true;
         }
 
-        cursor.close();
-        return true;
     }
+
+
 
     //Opens HomeActivity
     private void gotoHomeActivity() {
         Intent intent = new Intent(this, HomeActivity.class);
         intent.putExtra("LOGIN_ID", loginID);
         intent.putExtra("PASSWORD", password);
-        ((EditText) findViewById(R.id.passwordField)).setText("");
         startActivity(intent);
     }
 
@@ -167,12 +194,13 @@ public class AddActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume(){
         super.onResume();
         LifeVaultDB.getInstance(this).getWritableDatabase(new LifeVaultDB.OnDBReadyListener() {
             @Override
             public void onDBReady(SQLiteDatabase db) {
                 theDB = db;
+                Log.e("RESUMMMMME", "RERWERRWERERERW");
             }
         });
     }

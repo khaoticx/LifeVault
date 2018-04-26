@@ -21,6 +21,8 @@ public class LifeVaultDB extends SQLiteOpenHelper {
 
     private static LifeVaultDB lvDB;
 
+    private Context appContext;
+
     private static final String SQL_CREATE_USER_TABLE =
             "CREATE TABLE user (id TEXT PRIMARY KEY, " +
                     "email TEXT, " +
@@ -28,16 +30,14 @@ public class LifeVaultDB extends SQLiteOpenHelper {
                     "hash TEXT)";
 
     private static final String SQL_CREATE_NOTES_TABLE =
-            "CREATE TABLE notes (id, " +
-                    "title TEXT, " +
-                    "text TEXT, " +
-                    "PRIMARY KEY (id, title))";
+            "CREATE TABLE notes (id TEXT, title TEXT, data TEXT, iv TEXT, salt TEXT, PRIMARY KEY (id, title))";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS user";
 
     public LifeVaultDB(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
+        appContext = context.getApplicationContext();
     }
 
     @Override
@@ -67,17 +67,22 @@ public class LifeVaultDB extends SQLiteOpenHelper {
         new OpenDbAsyncTask().execute(listener);
     }
 
-    private static class OpenDbAsyncTask extends AsyncTask<OnDBReadyListener, Void, SQLiteDatabase> {
+    public void asyncWritableDatabase(OnDBReadyListener listener) {
+        new OpenDbAsyncTask().execute(listener);
+    }
+
+    private static class OpenDbAsyncTask extends AsyncTask<OnDBReadyListener,Void,SQLiteDatabase> {
         OnDBReadyListener listener;
 
         @Override
-        protected SQLiteDatabase doInBackground(OnDBReadyListener... params) {
+        protected SQLiteDatabase doInBackground(OnDBReadyListener... params){
             listener = params[0];
             return LifeVaultDB.lvDB.getWritableDatabase();
         }
 
         @Override
         protected void onPostExecute(SQLiteDatabase db) {
+            //Make that callback
             listener.onDBReady(db);
         }
     }
