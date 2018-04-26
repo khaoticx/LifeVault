@@ -48,7 +48,8 @@ public class AddActivity extends AppCompatActivity {
             Bundle extras = getIntent().getExtras();
             if (extras == null) {
                 Toast.makeText(getApplicationContext(), "error, login and password not correct", Toast.LENGTH_LONG).show();
-            } else {
+            }
+            else {
                 loginID = extras.getString("LOGIN_ID");
                 password = extras.getString("PASSWORD");
             }
