@@ -140,7 +140,6 @@ public class HomeActivity extends AppCompatActivity {
             byte[] salt = Base64.decode(cursor.getString(cursor.getColumnIndexOrThrow("salt")), Base64.DEFAULT);
             byte[] iv = Base64.decode(cursor.getString(cursor.getColumnIndexOrThrow("iv")), Base64.DEFAULT);
 
-
             try {
                 KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 256); // AES-256
                 SecretKeyFactory f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
@@ -153,11 +152,7 @@ public class HomeActivity extends AppCompatActivity {
                 Bundle args = new Bundle();
                 args.putLong("rowid", rowid);
                 args.putString("title",cursor.getString(cursor.getColumnIndexOrThrow("title")));
-                try {
-                    args.putString("data", new String(decryptedText, "UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+                args.putString("data", new String(decryptedText, "UTF-8"));
                 args.putString("iv",cursor.getString(cursor.getColumnIndexOrThrow("iv")));
                 args.putString("salt",cursor.getString(cursor.getColumnIndexOrThrow("salt")));
 
@@ -179,6 +174,8 @@ public class HomeActivity extends AppCompatActivity {
                 Log.e("IllegalBlockSize", e.toString());
             } catch (BadPaddingException e) {
                 Log.e("BadPadding", e.toString());
+            } catch (UnsupportedEncodingException e) {
+                Log.e("UnsupportedEncoding", e.toString());
             }
         }
         else {

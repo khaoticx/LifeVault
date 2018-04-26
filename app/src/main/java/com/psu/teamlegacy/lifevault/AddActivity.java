@@ -14,14 +14,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -29,7 +27,6 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-
 import static android.util.Base64.DEFAULT;
 
 public class AddActivity extends AppCompatActivity {
@@ -48,8 +45,7 @@ public class AddActivity extends AppCompatActivity {
             Bundle extras = getIntent().getExtras();
             if (extras == null) {
                 Toast.makeText(getApplicationContext(), "error, login and password not correct", Toast.LENGTH_LONG).show();
-            }
-            else {
+            } else {
                 loginID = extras.getString("LOGIN_ID");
                 password = extras.getString("PASSWORD");
             }
@@ -79,11 +75,11 @@ public class AddActivity extends AppCompatActivity {
                 gotoHomeActivity();
             }
         });
-
-
     }
 
     public void addNoteIntoDatabase(String loginID, String password, String title, String data){
+        byte[] encryptedData = null;
+
         if (!data.equals("")){
             try {
                 byte[] unencryptedText = data.getBytes("UTF-8");
@@ -99,6 +95,8 @@ public class AddActivity extends AppCompatActivity {
                 Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
                 SecretKeySpec specKey = new SecretKeySpec(key, "AES");
                 cipher.init(Cipher.ENCRYPT_MODE, specKey);
+                String encodedIV = Base64.encodeToString(cipher.getIV(), DEFAULT);
+                encryptedData = cipher.doFinal(unencryptedText);
 
                 //Remove trace of message
                 for (int i = 0; i < unencryptedText.length; i++) {
@@ -108,9 +106,9 @@ public class AddActivity extends AppCompatActivity {
                 ContentValues values = new ContentValues();
                 values.put("id", loginID);
                 values.put("title", title);
-                values.put("data", Base64.encodeToString(cipher.doFinal(unencryptedText), Base64.DEFAULT));
-                values.put("iv", Base64.encodeToString(cipher.getIV(), Base64.DEFAULT));
-                values.put("salt", Base64.encodeToString(salt, Base64.DEFAULT));
+                values.put("data", Base64.encodeToString(encryptedData, DEFAULT));
+                values.put("iv", encodedIV);
+                values.put("salt", Base64.encodeToString(salt, DEFAULT));
 
                 try {
                     theDB.insert("notes",null,values);
@@ -196,7 +194,6 @@ public class AddActivity extends AppCompatActivity {
             @Override
             public void onDBReady(SQLiteDatabase db) {
                 theDB = db;
-                Log.e("RESUMMMMME", "RERWERRWERERERW");
             }
         });
     }
