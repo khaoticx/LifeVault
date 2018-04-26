@@ -8,6 +8,18 @@
     tools:context="com.psu.teamlegacy.lifevault.NewAccountActivity">
 
     <TextView
+        android:id="@+id/REmailLbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:labelFor="@+id/emailField"
+        android:text="@string/rEmailLabel"
+        app:layout_constraintBottom_toBottomOf="@+id/rEmailField"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/rEmailField"
+        app:layout_constraintVertical_bias="0.629" />
+
+    <TextView
         android:id="@+id/NewAccountLbl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -117,7 +129,7 @@
         android:hint="@string/passwordHint"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/emailField" />
+        app:layout_constraintTop_toBottomOf="@+id/rEmailField" />
 
     <EditText
         android:id="@+id/confirmPasswordField"
@@ -142,4 +154,16 @@
         android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/loginIdField" />
+
+    <EditText
+        android:id="@+id/rEmailField"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="@string/emailHint"
+        android:inputType="textEmailAddress"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/emailField" />
 </android.support.constraint.ConstraintLayout>
