@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AlertDialog;
@@ -86,7 +87,7 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    public void onCreateSetupListView(){
+    public void onCreateSetupListView() {
 
 
         final ListView listView = findViewById(R.id.listView);
@@ -102,31 +103,10 @@ public class HomeActivity extends AppCompatActivity {
                 displayNote(id);
             }
         });
-
-       /*
-       adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
-            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-                if (columnIndex == 1) {
-                    final long rowid = cursor.getLong(cursor.getColumnIndex("title"));
-                    view.setOnClickListener(new View.OnClickListener() {
-
-                        public void onClick(View v) {
-                            //opens dialog
-                        }
-                    });
-                    return true;
-                }
-                return false;
-            }
-        });
-
-
-
-        */
     }
 
     public void displayNote(long rowid){
-        byte[] decryptedText = null;
+        byte[] decryptedText;
 
         String where = "_id = " + rowid;
         String[] projection = {"rowid _id", "id", "title", "data", "iv", "salt"};
@@ -151,6 +131,7 @@ public class HomeActivity extends AppCompatActivity {
 
                 Bundle args = new Bundle();
                 args.putLong("rowid", rowid);
+                args.putString("id", loginID);
                 args.putString("title",cursor.getString(cursor.getColumnIndexOrThrow("title")));
                 args.putString("data", new String(decryptedText, "UTF-8"));
                 args.putString("iv",cursor.getString(cursor.getColumnIndexOrThrow("iv")));
@@ -193,12 +174,7 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
-    private void updateListView(){
-        ListView listView = findViewById(R.id.listView);
-        SimpleCursorAdapter listAdapter = (SimpleCursorAdapter) listView.getAdapter();
-        Cursor newCursor = getAllNotes();
-        listAdapter.changeCursor(newCursor);
-    }
+
 
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
@@ -265,17 +241,14 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    public static class DisplayNoteDialog extends DialogFragment {
 
+
+    public static class DisplayNoteDialog extends DialogFragment {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final long rowid = getArguments().getLong("rowid");
+            final String loginID = getArguments().getString("id");
             final String title = getArguments().getString("title");
             final String data = getArguments().getString("data");
-            final String iv = getArguments().getString("iv");
-            final String salt = getArguments().getString("salt");
-
-
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle(title)
@@ -283,16 +256,36 @@ public class HomeActivity extends AppCompatActivity {
                     .setPositiveButton("Close",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
-
+                                    //Closes fragment automatically
                                 }
                             })
                     .setNegativeButton("Delete",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
+                                    try {
+                                        ((HomeActivity) getActivity()).deleteRecord(loginID, title);
+                                    } catch (SQLException e) {
+                                        Toast.makeText(getActivity(),
+                                                "Error deleting record.",
+                                                Toast.LENGTH_LONG).show();
+                                    }
                                 }
                             });
 
             return builder.create();
         }
+    }
+
+    public void deleteRecord(String id, String title){
+        String where = "id = ? AND title = ?";
+        theDB.delete("notes", where, new String[]{id, title});
+        updateListView();
+    }
+
+    private void updateListView(){
+        ListView listView = findViewById(R.id.listView);
+        SimpleCursorAdapter listAdapter = (SimpleCursorAdapter) listView.getAdapter();
+        Cursor newCursor = getAllNotes();
+        listAdapter.changeCursor(newCursor);
     }
 }
