@@ -98,11 +98,11 @@ public class MainActivity extends AppCompatActivity implements RecoveryDialog.Di
         }
         else {
             Cursor cursor = theDB.rawQuery("SELECT * FROM user WHERE id = ?", new String[]{
-                    ((TextView) findViewById(R.id.idField)).getText().toString()
+                    ((TextView) findViewById(R.id.loginField)).getText().toString()
             });
             //Cursor cursor = theDB.rawQuery("SELECT title FROM notes WHERE id=\"" + loginID + "\" AND title=\"" + newTitle + "\";", null);
 
-            if (((TextView) findViewById(R.id.idField)).getText().toString().equals("")){
+            if (((TextView) findViewById(R.id.loginField)).getText().toString().equals("")){
                 cursor.close();
                 return;
             }
@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements RecoveryDialog.Di
         //Get a database query for the login
         String sqlStr = "SELECT id, salt, hash FROM user WHERE id = ?";
         Cursor c = theDB.rawQuery(sqlStr,
-                new String[] {((TextView) findViewById(R.id.idField)).getText().toString()});
+                new String[] {((TextView) findViewById(R.id.loginField)).getText().toString()});
 
         if (c.moveToFirst()) {
             int salt = c.getInt(c.getColumnIndexOrThrow("salt"));
@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements RecoveryDialog.Di
             c.close();
 
             //Hash the user's input for password
-            byte[] passwordByte = (salt + ((EditText) findViewById(R.id.pwField)).getText().toString()).getBytes();
+            byte[] passwordByte = (salt + ((EditText) findViewById(R.id.loginField)).getText().toString()).getBytes();
             MessageDigest md = MessageDigest.getInstance("SHA-512");
             md.update(passwordByte);
             byte[] newHash = md.digest();
@@ -162,9 +162,9 @@ public class MainActivity extends AppCompatActivity implements RecoveryDialog.Di
     //Opens HomeActivity
     private void gotoHomeActivity() {
         Intent intent = new Intent(this, HomeActivity.class);
-        intent.putExtra("LOGIN_ID", ((EditText) findViewById(R.id.idField)).getText().toString());
-        intent.putExtra("PASSWORD", ((EditText) findViewById(R.id.pwField)).getText().toString());
-        ((EditText) findViewById(R.id.pwField)).setText("");
+        intent.putExtra("LOGIN_ID", ((EditText) findViewById(R.id.loginField)).getText().toString());
+        intent.putExtra("PASSWORD", ((EditText) findViewById(R.id.passwordField)).getText().toString());
+        ((EditText) findViewById(R.id.passwordField)).setText("");
         startActivity(intent);
     }
 

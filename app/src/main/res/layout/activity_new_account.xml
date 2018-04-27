@@ -5,7 +5,8 @@
     android:id="@+id/LoginIDLbl"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.psu.teamlegacy.lifevault.NewAccountActivity">
+    tools:context="com.psu.teamlegacy.lifevault.NewAccountActivity"
+    android:background="@drawable/vaultdoor">
 
     <TextView
         android:id="@+id/REmailLbl"
