@@ -4,12 +4,14 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.SystemClock;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -55,7 +57,7 @@ public class HomeActivity extends AppCompatActivity {
     private String password;
     private SimpleCursorAdapter adapter;
     private SQLiteDatabase theDB;
-
+    private long lastClickTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,20 +90,21 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void onCreateSetupListView() {
-
-
         final ListView listView = findViewById(R.id.listView);
-
-
         Cursor cursor = getAllNotes();
         adapter = new SimpleCursorAdapter(this, R.layout.list_item, cursor, new String[]{"title"}, new int[]{R.id.listViewEntry}, 0);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position,
-                                    long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //Prevents double clicks
+                if (SystemClock.elapsedRealtime() - lastClickTime < 1000){
+                    return;
+                }
+                lastClickTime = SystemClock.elapsedRealtime();
                 displayNote(id);
             }
+
         });
     }
 
@@ -171,7 +174,6 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         return theDB.rawQuery("SELECT rowid _id,* FROM notes WHERE id = ? ORDER BY title", new String[] {loginID});
-
     }
 
 
@@ -241,8 +243,6 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-
-
     public static class DisplayNoteDialog extends DialogFragment {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -250,25 +250,27 @@ public class HomeActivity extends AppCompatActivity {
             final String title = getArguments().getString("title");
             final String data = getArguments().getString("data");
 
+
+
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle(title)
                     .setMessage(data)
                     .setPositiveButton("Close",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
-                                    //Closes fragment automatically
+                                    //Closes automatically
                                 }
                             })
-                    .setNegativeButton("Delete",
+                    .setNegativeButton("Edit",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
-                                    try {
-                                        ((HomeActivity) getActivity()).deleteRecord(loginID, title);
-                                    } catch (SQLException e) {
-                                        Toast.makeText(getActivity(),
-                                                "Error deleting record.",
-                                                Toast.LENGTH_LONG).show();
-                                    }
+                                    ((HomeActivity) getActivity()).createEditDialog(loginID, title, data);
+                                }
+                            })
+                    .setNeutralButton("Delete",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    ((HomeActivity) getActivity()).confirmDelete(title);
                                 }
                             });
 
@@ -276,10 +278,160 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
+    public void confirmDelete(String title){
+        Bundle args = new Bundle();
+        args.putString("id", loginID);
+        args.putString("title", title);
+        ConfirmDeleteDialog dialog = new ConfirmDeleteDialog();
+        dialog.setArguments(args);
+        dialog.show(getFragmentManager(), "NoteDialog");
+    }
+
     public void deleteRecord(String id, String title){
         String where = "id = ? AND title = ?";
         theDB.delete("notes", where, new String[]{id, title});
         updateListView();
+    }
+
+    public static class ConfirmDeleteDialog extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the Builder class for convenient dialog construction
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Warning!")
+                    .setMessage("Are you sure you want to delete this entry?")
+                    .setPositiveButton(R.string.deleteBtn, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            try {
+                                ((HomeActivity) getActivity()).deleteRecord(getArguments().getString("id"),
+                                                                        getArguments().getString("title"));
+                            } catch (SQLException e) {
+                                Toast.makeText(getActivity(),
+                                        "Error deleting record.",
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    })
+                    .setNegativeButton(R.string.cancelBtn, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User cancelled the dialog
+                        }
+                    });
+            // Create the AlertDialog object and return it
+            return builder.create();
+        }
+    }
+
+    public static class DisplayEditDialog extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final String loginID = getArguments().getString("id");
+            final String title = getArguments().getString("title");
+            final String data = getArguments().getString("data");
+
+
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            View view = inflater.inflate(R.layout.edit_note, null);
+            ((TextView)view.findViewById(R.id.newEntryTitle)).setText(title);
+            final EditText newText = ((EditText)view.findViewById(R.id.newEntryText));
+            newText.setText(data);
+
+            builder.setView(view)
+                    .setPositiveButton("Edit",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    try {
+                                        ((HomeActivity) getActivity()).editRecord(loginID, title, newText.getText().toString());
+                                    } catch (SQLException e) {
+                                        Toast.makeText(getActivity(),
+                                                "Error deleting record.",
+                                                Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            })
+                    .setNegativeButton("Cancel",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    //Dismiss automatically
+                                }
+                            });
+            return builder.create();
+        }
+    }
+
+    public void createEditDialog(String id, String title, String data){
+        Bundle args = new Bundle();
+        args.putString("id", id);
+        args.putString("title", title);
+        args.putString("data", data);
+        DisplayEditDialog dialog = new DisplayEditDialog();
+        dialog.setArguments(args);
+        dialog.show(getFragmentManager(), "NoteDialog");
+    }
+
+    public void editRecord(String id, String title, String newData){
+        if (!newData.equals("")){
+            try {
+                byte[] unencryptedText = newData.getBytes("UTF-8");
+
+                SecureRandom random = new SecureRandom();
+                byte[] salt = new byte[16];
+                random.nextBytes(salt);
+
+                KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 256); // AES-256
+                SecretKeyFactory f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+                byte[] key = f.generateSecret(spec).getEncoded();
+
+                Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+                SecretKeySpec specKey = new SecretKeySpec(key, "AES");
+                cipher.init(Cipher.ENCRYPT_MODE, specKey);
+                String encodedIV = Base64.encodeToString(cipher.getIV(), DEFAULT);
+                byte[] encryptedData = cipher.doFinal(unencryptedText);
+
+                //Remove trace of message
+                for (int i = 0; i < unencryptedText.length; i++) {
+                    unencryptedText[i] = 0;
+                }
+
+                ContentValues values = new ContentValues();
+                values.put("title", title);
+                values.put("data", Base64.encodeToString(encryptedData, DEFAULT));
+                values.put("iv", encodedIV);
+                values.put("salt", Base64.encodeToString(salt, DEFAULT));
+                String where = "(id = ? AND title = ?)";
+
+                int count = 0;
+                try {
+                    count = theDB.update("notes", values, where, new String[]{loginID, title});
+                } catch (SQLException e) {
+                    Log.e("JokeDB", e.getMessage());
+                }
+                if (count == 0) {
+                    Toast.makeText(this, "Error updating record.", Toast.LENGTH_LONG).show();
+                }
+
+            } catch (UnsupportedEncodingException ex){
+                Log.e("UnsupportedEncoding", ex.toString());
+            } catch (NoSuchPaddingException ex){
+                Log.e("NoSuchPadding", ex.toString());
+            } catch (NoSuchAlgorithmException ex){
+                Log.e("NoSuchAlgorithm", ex.toString());
+            } catch (InvalidKeyException ex){
+                Log.e("InvalidKey", ex.toString());
+            } catch (IllegalBlockSizeException ex) {
+                Log.e("IllegalBlockSize", ex.toString());
+            } catch (BadPaddingException ex) {
+                Log.e("BadPadding", ex.toString());
+            } catch (InvalidKeySpecException ex) {
+                Log.e("InvalidKeySpec", ex.toString());
+            }
+        }
+        else {
+            Toast.makeText(this, "Note is empty..", Toast.LENGTH_LONG).show();
+        }
+
+        //updateListView();
     }
 
     private void updateListView(){

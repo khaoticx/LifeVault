@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -33,6 +35,7 @@ public class AddActivity extends AppCompatActivity {
     private String loginID;
     private String password;
     private SQLiteDatabase theDB;
+    private long mLastClickTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +61,12 @@ public class AddActivity extends AppCompatActivity {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
+                //Prevents double clicks
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 1000){
+                    return;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
+
                 if (checkIfNotExists(loginID, ((EditText)findViewById(R.id.newEntryTitle)).getText().toString())){
                     addNoteIntoDatabase(loginID, password, ((EditText)findViewById(R.id.newEntryTitle)).getText().toString(),
                             ((EditText)findViewById(R.id.newEntryText)).getText().toString());
@@ -178,6 +187,8 @@ public class AddActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putString("loginID", loginID);
         savedInstanceState.putString("password", password);
+        savedInstanceState.putString("title", ((EditText)findViewById(R.id.newEntryTitle)).getText().toString());
+        savedInstanceState.putString("text", ((EditText)findViewById(R.id.newEntryText)).getText().toString());
         super.onSaveInstanceState(savedInstanceState);
     }
 
@@ -185,6 +196,9 @@ public class AddActivity extends AppCompatActivity {
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         loginID = savedInstanceState.getString("loginID");
         password = savedInstanceState.getString("password");
+        ((EditText)findViewById(R.id.newEntryTitle)).setText(savedInstanceState.getString("title"));
+        ((EditText)findViewById(R.id.newEntryText)).setText(savedInstanceState.getString("text"));
+
     }
 
     @Override
