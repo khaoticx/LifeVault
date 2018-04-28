@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
@@ -16,6 +17,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Properties;
 
 
 //This class implements the RecoverDialog.DialogListener as a callback interface
@@ -141,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements RecoveryDialog.Di
             c.close();
 
             //Hash the user's input for password
-            byte[] passwordByte = (salt + ((EditText) findViewById(R.id.loginField)).getText().toString()).getBytes();
+            byte[] passwordByte = (salt + ((EditText) findViewById(R.id.passwordField)).getText().toString()).getBytes();
             MessageDigest md = MessageDigest.getInstance("SHA-512");
             md.update(passwordByte);
             byte[] newHash = md.digest();
