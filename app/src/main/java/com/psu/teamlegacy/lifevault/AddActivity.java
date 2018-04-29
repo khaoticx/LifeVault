@@ -2,10 +2,12 @@ package com.psu.teamlegacy.lifevault;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -39,6 +41,14 @@ public class AddActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String theme = sharedPreferences.getString("theme", "");
+        if (theme.equals("light")) {
+            this.setTheme(R.style.light);
+        } else {
+            this.setTheme(R.style.dark);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
         Toolbar myToolbar = findViewById(R.id.toolbar);
@@ -79,9 +89,10 @@ public class AddActivity extends AppCompatActivity {
 
         Button cancelButton = findViewById(R.id.cancelBtn);
         cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
+            @Overrid
             public void onClick(View arg0) {
                 gotoHomeActivity();
+                finish();
             }
         });
     }
@@ -121,7 +132,7 @@ public class AddActivity extends AppCompatActivity {
 
                 try {
                     theDB.insert("notes",null,values);
-                    gotoHomeActivity();
+                    finish();
                 } catch (SQLException ex) {
                     Log.e("SQLException", ex.toString());
                     Toast.makeText(this,"Error, new note not added.",Toast.LENGTH_LONG).show();

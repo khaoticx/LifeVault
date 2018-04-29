@@ -2,12 +2,15 @@ package com.psu.teamlegacy.lifevault;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,14 +25,23 @@ import java.util.Properties;
 
 //This class implements the RecoverDialog.DialogListener as a callback interface
 public class MainActivity extends AppCompatActivity implements RecoveryDialog.DialogListener {
-    SQLiteDatabase theDB;
+    private SQLiteDatabase theDB;
+    SharedPreferences sharedpreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        sharedpreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String theme = sharedpreferences.getString("theme", "light");
+        Log.wtf("THEMEEEEEE", theme);
+        if (theme.equals("light")) {
+            this.setTheme(R.style.light);
+            }
+        else {
+            this.setTheme(R.style.dark);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        //LifeVaultDB db = new LifeVaultDB(this);
 
         //Attach a listener to UI Button
         Button logInButton = findViewById(R.id.LogInBtn);

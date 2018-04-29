@@ -3,12 +3,15 @@ package com.psu.teamlegacy.lifevault;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,6 +31,15 @@ public class NewAccountActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String theme = sharedPreferences.getString("theme", "");
+        Log.e("THEME", theme);
+        if (theme.equals("light")) {
+            setTheme(R.style.light);
+        } else {
+            setTheme(R.style.dark);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_account);
 
@@ -56,6 +68,7 @@ public class NewAccountActivity extends AppCompatActivity {
 
                                                     //Go back to Main Activity after successful creation of new account.
                                                     goToMainActivity();
+                                                    finish();
                                                 }
                                             });
                                     alertDialog.show();
@@ -109,7 +122,7 @@ public class NewAccountActivity extends AppCompatActivity {
             @Override
             public void onClick(View arg0) {
                 //Cancel and go back to Main activity
-                goToMainActivity();
+                finish();
             }
         });
     }
@@ -187,6 +200,7 @@ public class NewAccountActivity extends AppCompatActivity {
             values.put("recoverstarttime", -1);
 
             long newRowId = theDB.insert("user", null, values);
+            finish();
         }
     }
 
@@ -194,6 +208,7 @@ public class NewAccountActivity extends AppCompatActivity {
     private void goToMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+        finish();
     }
 }
 
